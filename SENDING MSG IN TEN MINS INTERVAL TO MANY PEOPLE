@@ -1,0 +1,26 @@
+from twilio.rest import Client
+import time
+
+account_sid = ""
+auth_token = ""
+
+client = Client(account_sid, auth_token)
+
+# Add all numbers here
+members = [
+    "whatsapp:+918838787127",
+    "whatsapp:+919498010204",
+    "whatsapp:+919488223505"
+]
+
+while True:
+    for number in members:
+        message = client.messages.create(
+            body="💧 Reminder: Drink water now! (Test Mode)",
+            from_='whatsapp:+14155238886',
+            to=number
+        )
+        print("Message sent to", number)
+
+    print("Waiting 10 minutes...\n")
+    time.sleep(600)  # 10 minutes
