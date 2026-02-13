@@ -3,8 +3,8 @@ from datetime import datetime
 from twilio.rest import Client
 
 # Your Twilio credentials (TEMPORARY for local testing)
-account_sid = os.environ("TWILIO_ACCOUNT_SID")
-auth_token = os.environ("TWILIO_AUTH_TOKEN")
+account_sid = os.environ("ACCOUNT_SID")
+auth_token = os.environ("AUTH_TOKEN")
 
 client = Client(account_sid, auth_token)
 
@@ -42,5 +42,6 @@ if 2 <= current_hour <= 12:
         print(f"Message sent to {number}")
 else:
     print("Outside scheduled time window.")
+
 
 
