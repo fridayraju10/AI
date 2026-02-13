@@ -29,7 +29,7 @@ messages = [
 
 current_hour = datetime.now().hour
 
-if 0 <= current_hour <= 11:
+if 2 <= current_hour <= 12:
     message_index = current_hour % len(messages)
     message_body = messages[message_index]
 
@@ -42,3 +42,4 @@ if 0 <= current_hour <= 11:
         print(f"Message sent to {number}")
 else:
     print("Outside scheduled time window.")
+
