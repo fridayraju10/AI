@@ -1,0 +1,43 @@
+import requests
+from twilio.rest import Client
+
+# Twilio config
+account_sid = "AC78393198e6d66cdd374d1120e73b45f2"
+auth_token = "feea5d34fd851bb71dcedabd657dfbd9"
+
+client = Client(account_sid, auth_token)
+
+# List of recipients
+recipients = [
+    'whatsapp:+918838787127',
+    'whatsapp:+918015425366',
+    'whatsapp:+919047663973'
+]
+
+# Fetch jobs
+url = "https://remoteok.com/api"
+jobs = requests.get(url).json()
+
+for job in jobs:
+    if isinstance(job, dict):
+        title = job.get("position", "")
+
+        if "python" in title.lower() or "engineer" in title.lower() or "machine" in title.lower():
+            message = f"""
+🔥 Python Job Alert
+
+Company: {job.get("company")}
+Role: {title}
+Link: {job.get("url")}
+"""
+
+            # Send to all recipients
+            for number in recipients:
+                client.messages.create(
+                    from_='whatsapp:+14155238886',
+                    body=message,
+                    to=number
+                )
+
+            print("Message sent to all ✅")
+            break
