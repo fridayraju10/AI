@@ -1,0 +1,68 @@
+from flask import Flask, request
+from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+import smtplib
+from email.message import EmailMessage
+
+app = Flask(__name__)
+
+# ✅ Generate PDF
+def generate_invoice(name, service, amount):
+    file_name = "invoice.pdf"
+    doc = SimpleDocTemplate(file_name)
+    styles = getSampleStyleSheet()
+
+    content = []
+    content.append(Paragraph("INVOICE", styles['Title']))
+    content.append(Paragraph(f"Customer: {name}", styles['Normal']))
+    content.append(Paragraph(f"Service: {service}", styles['Normal']))
+    content.append(Paragraph(f"Amount: Rs.{amount}", styles['Normal']))
+
+    doc.build(content)
+    return file_name
+
+# ✅ Send Email
+def send_email(to_mail, file_name):
+    msg = EmailMessage()
+    msg['Subject'] = "Your Invoice"
+    msg['From'] = "raj.friday@gmail.com"
+    msg['To'] = to_mail
+    msg.set_content("Please find attached invoice")
+
+    with open(file_name, 'rb') as f:
+        msg.add_attachment(f.read(), maintype='application', subtype='pdf', filename=file_name)
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login("raj.friday@gmail.com", "kzan hljw eamw ampw")
+    server.send_message(msg)
+    server.quit()
+
+# ✅ Receive SMS from Twilio
+@app.route("/sms", methods=['GET','POST'])
+def sms_reply():
+    try:
+        msg = request.values.get('Body')
+        print("Received message:", msg)
+
+        parts = msg.split('|')
+
+        if len(parts) < 5:
+            return "Invalid format!"
+
+        name = parts[1].strip()
+        service = parts[2].strip()
+        amount = parts[3].strip()
+        email = parts[4].strip()
+
+        file = generate_invoice(name, service, amount)
+        send_email(email, file)
+
+        return "Invoice sent!"
+
+    except Exception as e:
+        print("ERROR:", e)
+        return "Error occurred"
+
+if __name__ == "__main__":
+    app.run(port=5000)
