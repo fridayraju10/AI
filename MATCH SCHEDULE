@@ -1,0 +1,107 @@
+import tkinter as tk
+from tkinter import scrolledtext
+import random
+
+root = tk.Tk()
+root.title("Match Scheduler Pro")
+root.geometry("750x700")
+root.config(bg="#1e1e2f")   # Dark background
+
+team_entries = []
+
+# ---------------- Fonts ----------------
+title_font = ("Arial", 18, "bold")
+label_font = ("Arial", 12)
+entry_font = ("Arial", 12)
+button_font = ("Arial", 12, "bold")
+
+# ---------------- Functions ----------------
+
+def create_team_fields():
+    global team_entries
+
+    for widget in team_frame.winfo_children():
+        widget.destroy()
+    team_entries = []
+
+    num = int(num_teams_entry.get())
+
+    for i in range(num):
+        lbl = tk.Label(team_frame, text=f"Team {i+1}:",
+                       font=label_font, bg="#1e1e2f", fg="white")
+        lbl.grid(row=i, column=0, padx=10, pady=5)
+
+        entry = tk.Entry(team_frame, font=entry_font, width=25)
+        entry.grid(row=i, column=1, padx=10, pady=5)
+
+        team_entries.append(entry)
+
+
+def generate_schedule():
+    teams = [entry.get() for entry in team_entries]
+    matches_per_pair = int(matches_entry.get())
+
+    match_pairs = []
+
+    for i in range(len(teams)):
+        for j in range(i + 1, len(teams)):
+            for _ in range(matches_per_pair):
+                match_pairs.append((teams[i], teams[j]))
+
+    random.shuffle(match_pairs)
+
+    output_box.delete(1.0, tk.END)
+
+    match_number = 1
+    for pair in match_pairs:
+        output_box.insert(tk.END,
+            f"Match {match_number}: {pair[0]} vs {pair[1]}\n")
+        match_number += 1
+
+
+# ---------------- UI ----------------
+
+# Title
+tk.Label(root, text="⚽ Match Scheduler",
+         font=title_font, bg="#1e1e2f", fg="#00ffcc").pack(pady=15)
+
+# Input Frame
+input_frame = tk.Frame(root, bg="#2b2b3c", bd=2, relief="ridge")
+input_frame.pack(pady=10, padx=10, fill="x")
+
+tk.Label(input_frame, text="Number of Teams:",
+         font=label_font, bg="#2b2b3c", fg="white").grid(row=0, column=0, padx=10, pady=10)
+
+num_teams_entry = tk.Entry(input_frame, font=entry_font)
+num_teams_entry.grid(row=0, column=1, padx=10)
+
+create_btn = tk.Button(input_frame, text="Create Teams",
+                       font=button_font, bg="#00cc66", fg="white",
+                       command=create_team_fields)
+create_btn.grid(row=0, column=2, padx=10)
+
+# Team Frame
+team_frame = tk.Frame(root, bg="#1e1e2f")
+team_frame.pack(pady=10)
+
+# Matches input
+tk.Label(root, text="Matches per pair:",
+         font=label_font, bg="#1e1e2f", fg="white").pack()
+
+matches_entry = tk.Entry(root, font=entry_font)
+matches_entry.pack(pady=5)
+
+# Generate Button
+tk.Button(root, text="Generate Schedule",
+          font=button_font, bg="#ff6600", fg="white",
+          command=generate_schedule).pack(pady=15)
+
+# Output Box
+output_box = scrolledtext.ScrolledText(root,
+                                       width=80, height=20,
+                                       font=("Consolas", 11),
+                                       bg="#0f172a", fg="#00ffcc",
+                                       insertbackground="white")
+output_box.pack(padx=10, pady=10)
+
+root.mainloop()
