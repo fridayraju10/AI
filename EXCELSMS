@@ -1,0 +1,44 @@
+import pandas as pd
+from twilio.rest import Client
+import time
+
+# 🔹 Twilio credentials
+account_sid = "AC78393198e6d66cdd374d1120e73b45f2"
+auth_token = "da366633d193804a8485bdde5814deeb"
+
+client = Client(account_sid, auth_token)
+
+# 🔹 Read Excel
+df = pd.read_excel("data.xlsx")
+
+# 🔹 Loop
+for i in range(len(df)):
+    name = df.loc[i, "name"]
+    designation = df.loc[i, "designation"]
+    number = str(df.loc[i, "number"])
+
+    # ✅ Add +91 if missing
+    if not number.startswith("+"):
+        number = "+91" + number
+
+    # 🔹 Message logic
+    messages = {
+        "staff": "Meeting scheduled today.",
+        "student": "Please attend the session.",
+        "friend": "Let's catch up!",
+        "wife": "Take care ❤️"
+    }
+
+    msg = messages.get(designation.lower(), "Hello!")
+    final_message = f"Dear {name}, {msg}"
+
+    # 🔹 Send WhatsApp
+    client.messages.create(
+        from_='whatsapp:+14155238886',
+        body=final_message,
+        to=f'whatsapp:{number}'
+    )
+
+    print(f"Sent to {name} -> {number}")
+
+    time.sleep(1)   # ⏱ 1 second gappip install pandas==2.2.2 openpyxl
